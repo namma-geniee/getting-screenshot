@@ -10,6 +10,9 @@
   "author": "Mai Anh Nam <namma@geniee.co.jp>",
   "license": "ISC",
   "dependencies": {
+    "@slack/client": "^3.12.0",
+    "fs.extra": "^1.3.2",
+    "moment": "^2.18.1",
     "puppeteer": "^0.10.2"
   }
 }
