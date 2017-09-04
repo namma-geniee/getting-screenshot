@@ -13,7 +13,7 @@ module.exports = {
 
   page: {
     defaultViewport: {
-      width:  process.env.DEFAUTL_VIEWPORT_WIDTH || 1366,
+      width:  process.env.DEFAULT_VIEWPORT_WIDTH || 1366,
       height: process.env.DEFAULT_VIEWPORT_HEIGHT || 768
     }
   },
