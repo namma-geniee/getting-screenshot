@@ -3,7 +3,10 @@
 const { IncomingWebhook } = require('@slack/client')
 const config              = require('../../config')
 
-const webhook = new IncomingWebhook(config.slack.webhookUrl)
+const webhook = new IncomingWebhook(
+  config.slack.webhookUrl,
+  config.slack.defaults
+)
 
 const notifier = {
   /**

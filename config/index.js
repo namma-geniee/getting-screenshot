@@ -19,7 +19,11 @@ module.exports = {
   },
 
   slack: {
-    webhookUrl: process.env.SLACK_WEBHOOK_URL || 'https://hooks.slack.com/services/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'
+    webhookUrl: process.env.SLACK_WEBHOOK_URL || 'https://hooks.slack.com/services/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',
+    defaults:   {
+      username:  process.env.SLACK_USERNAME || 'GS Notification',
+      iconEmoji: ':ghost:'
+    }
   },
 
   scrapers: require('./adnetworkScrapers.json')
