@@ -22,13 +22,8 @@ class AbstractScraper {
   /**
    * @returns {string}
    */
-  get historyStoragePath () {
-    const task = this.scrapingTask;
-    return storageHelper.getAccountStoragePath(
-      task.adnetworkName,
-      task.accountName,
-      task.historyTime
-    )
+  get taskStoragePath () {
+    return storageHelper.getTaskStoragePath(this.scrapingTask)
   }
 
   /**
@@ -53,7 +48,7 @@ class AbstractScraper {
 
     await this.page.setViewport(this.viewport);
 
-    await fs.mkdirRecursiveSync(this.historyStoragePath)
+    await fs.mkdirRecursiveSync(this.taskStoragePath)
   }
 
   /**
@@ -64,7 +59,7 @@ class AbstractScraper {
   async run () {
     await this.init();
 
-    const screenshotPath = `${this.historyStoragePath}/screenshot.png`;
+    const screenshotPath = `${this.taskStoragePath}/screenshot.png`;
 
     try {
       const authenticated = await this.login();

@@ -15,22 +15,10 @@ exports.getStoragePath = function (storageRelativePath ) {
 };
 
 /**
- * @param {string} adnetworkName
+ * @param {ScrapingTask} task
  * @returns {string}
  */
-exports.getAdnetworkStoragePath = function (adnetworkName) {
-  return path.join(STORAGE_DATA_PATH, adnetworkName)
-};
-
-/**
- * @param {string} adnetworkName
- * @param {string} accountName
- * @param {Date} date
- * @returns {string}
- */
-exports.getAccountStoragePath = function (adnetworkName, accountName, date) {
-  const yearAndMonth = date ? moment(date).format('YYYY-MM') : undefined;
-  const adnetworkPath = this.getAdnetworkStoragePath(adnetworkName);
-
-  return path.join(adnetworkPath, `${yearAndMonth}/${accountName}`)
+exports.getTaskStoragePath = function (task) {
+  const yearAndMonth = moment(task.scheduleTime).format('YYYY-MM');
+  return path.join(STORAGE_DATA_PATH, `${yearAndMonth}/${task.adnetworkName}/${task.accountName}`);
 };
