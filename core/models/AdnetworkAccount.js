@@ -3,12 +3,12 @@
 class AdnetworkAccount {
   /**
    * @param {string} adnetworkName
-   * @param {string} acccountName
+   * @param {string} accountName
    * @param {Object} credentials
    */
-  constructor (adnetworkName, acccountName, credentials) {
+  constructor (adnetworkName, accountName, credentials) {
     this.adnetworkName = adnetworkName
-    this.accountName   = acccountName
+    this.accountName   = accountName
     this.credentials   = credentials
   }
 }
