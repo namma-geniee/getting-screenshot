@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 module.exports = {
 
@@ -27,4 +27,4 @@ module.exports = {
   },
 
   scrapers: require('./adnetworkScrapers.json')
-}
+};

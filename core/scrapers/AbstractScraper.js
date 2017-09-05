@@ -1,21 +1,21 @@
-'use strict'
+'use strict';
 
-const puppeteer     = require('puppeteer')
-const fs            = require('fs.extra')
-const storageHelper = require('../helper/storageHelper')
-const slackNotifier = require('../slack/notifier')
-const config        = require('../../config')
+const puppeteer     = require('puppeteer');
+const fs            = require('fs.extra');
+const storageHelper = require('../helper/storageHelper');
+const slackNotifier = require('../slack/notifier');
+const config        = require('../../config');
 
-const MESSAGE_METHOD_NOT_IMPLEMENTED = 'Method not implemented'
-const MESSAGE_AUTH_FAILED            = 'Authentication failed'
+const MESSAGE_METHOD_NOT_IMPLEMENTED = 'Method not implemented';
+const MESSAGE_AUTH_FAILED            = 'Authentication failed';
 
 class AbstractScraper {
   /**
    * @param {ScrapingTask} scrapingTask
    */
   constructor (scrapingTask) {
-    this.scrapingTask = scrapingTask
-    this.browser      = undefined
+    this.scrapingTask = scrapingTask;
+    this.browser      = undefined;
     this.page         = undefined
   }
 
@@ -23,7 +23,7 @@ class AbstractScraper {
    * @returns {string}
    */
   get historyStoragePath () {
-    const task = this.scrapingTask
+    const task = this.scrapingTask;
     return storageHelper.getAccountStoragePath(
       task.adnetworkName,
       task.accountName,
@@ -48,10 +48,10 @@ class AbstractScraper {
    * @returns {Promise.<void>}
    */
   async init () {
-    this.browser = await puppeteer.launch(config.browser)
-    this.page    = await this.browser.newPage()
+    this.browser = await puppeteer.launch(config.browser);
+    this.page    = await this.browser.newPage();
 
-    await this.page.setViewport(this.viewport)
+    await this.page.setViewport(this.viewport);
 
     await fs.mkdirRecursiveSync(this.historyStoragePath)
   }
@@ -62,17 +62,17 @@ class AbstractScraper {
    * @returns {Promise.<void>}
    */
   async run () {
-    await this.init()
+    await this.init();
 
-    const screenshotPath = `${this.historyStoragePath}/screenshot.png`
+    const screenshotPath = `${this.historyStoragePath}/screenshot.png`;
 
     try {
-      const authenticated = await this.login()
+      const authenticated = await this.login();
       if (!authenticated) {
         throw new Error(MESSAGE_AUTH_FAILED)
       }
 
-      const revenue = await this.getRevenue()
+      const revenue = await this.getRevenue();
       console.info(`> Revenue = ${revenue}`)
     }
     catch (err) {
@@ -83,7 +83,7 @@ class AbstractScraper {
     await this.page.screenshot({
       path:     screenshotPath,
       fullPage: true
-    })
+    });
 
     // Close the browser after the task is done
     await this.browser.close()
@@ -113,9 +113,9 @@ class AbstractScraper {
    * @param {string} moneyString
    */
   extractMoney (moneyString) {
-    const extracted = moneyString.replace(/[,\s\%￥$]/g, '')
+    const extracted = moneyString.replace(/[,\s\%￥$]/g, '');
     return parseFloat(extracted)
   }
 }
 
-module.exports = AbstractScraper
+module.exports = AbstractScraper;

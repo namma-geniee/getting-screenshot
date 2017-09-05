@@ -1,12 +1,12 @@
-'use strict'
+'use strict';
 
-const { IncomingWebhook } = require('@slack/client')
-const config              = require('../../config')
+const { IncomingWebhook } = require('@slack/client');
+const config              = require('../../config');
 
 const webhook = new IncomingWebhook(
   config.slack.webhookUrl,
   config.slack.defaults
-)
+);
 
 const notifier = {
   /**
@@ -27,6 +27,6 @@ const notifier = {
       webhook.send(message, (err, resp) => err ? reject(err) : resolve(resp))
     })
   }
-}
+};
 
-module.exports = notifier
+module.exports = notifier;

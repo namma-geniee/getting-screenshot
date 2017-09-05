@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 class AdnetworkAccount {
   /**
@@ -7,10 +7,10 @@ class AdnetworkAccount {
    * @param {Object} credentials
    */
   constructor (adnetworkName, accountName, credentials) {
-    this.adnetworkName = adnetworkName
-    this.accountName   = accountName
+    this.adnetworkName = adnetworkName;
+    this.accountName   = accountName;
     this.credentials   = credentials
   }
 }
 
-module.exports = AdnetworkAccount
+module.exports = AdnetworkAccount;

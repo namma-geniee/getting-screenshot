@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 class ScrapingTask {
   /**
@@ -7,8 +7,8 @@ class ScrapingTask {
    * @param {AdnetworkAccount} adnetworkAccount
    */
   constructor (scheduleTime, historyTime, adnetworkAccount) {
-    this.scheduleTime     = scheduleTime
-    this.historyTime      = historyTime
+    this.scheduleTime     = scheduleTime;
+    this.historyTime      = historyTime;
     this.adnetworkAccount = adnetworkAccount
   }
 
@@ -25,4 +25,4 @@ class ScrapingTask {
   }
 }
 
-module.exports = ScrapingTask
+module.exports = ScrapingTask;
