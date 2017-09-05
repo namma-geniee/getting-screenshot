@@ -3,12 +3,10 @@
 class ScrapingTask {
   /**
    * @param {Date} scheduleTime
-   * @param {Date} historyTime
    * @param {AdnetworkAccount} adnetworkAccount
    */
-  constructor (scheduleTime, historyTime, adnetworkAccount) {
+  constructor (scheduleTime, adnetworkAccount) {
     this.scheduleTime     = scheduleTime;
-    this.historyTime      = historyTime;
     this.adnetworkAccount = adnetworkAccount
   }
 
