@@ -63,22 +63,29 @@ class AbstractScraper {
   /**
    * Main execution script
    *
-   * @returns {Promise.<void>}
+   * @returns {Promise.<{revenue: undefined, screenshotPath: string, startTime: Date, endTime: undefined, elapsedMs: undefined, elapsedSec: undefined}>}
    */
   async run () {
     await this.init();
 
-    let revenue              = null;
-    const { screenshotPath } = this;
-    const startTime          = new Date();
+    // Some of result's properties will be defined later in & after scraping process
+    const result = {
+      revenue:        undefined,
+      screenshotPath: this.screenshotPath,
+      startTime:      new Date(),
+      endTime:        undefined,
+      elapsedMs:      undefined,
+      elapsedSec:     undefined
+    };
 
+    // TODO: Remove try-catch
     try {
       const authenticated = await this.login();
       if (!authenticated) {
         throw new Error(MESSAGE_AUTH_FAILED)
       }
 
-      revenue = await this.getRevenue();
+      result.revenue = await this.getRevenue();
     }
     catch (err) {
       console.error('> Got error:', err)
@@ -86,25 +93,18 @@ class AbstractScraper {
 
     // Save screenshot for the last screen whether succeeded or failed
     await this.page.screenshot({
-      path:     screenshotPath,
+      path:     result.screenshotPath,
       fullPage: true
     });
 
     // Close the browser after the task is done
     await this.browser.close();
 
-    const endTime    = new Date();
-    const elapsedMs  = endTime - startTime;
-    const elapsedSec = (elapsedMs / 1000).toFixed(3);
+    result.endTime    = new Date();
+    result.elapsedMs  = result.endTime - result.startTime;
+    result.elapsedSec = (result.elapsedMs / 1000).toFixed(3);
 
-    return {
-      revenue,
-      screenshotPath,
-      startTime,
-      endTime,
-      elapsedMs,
-      elapsedSec
-    };
+    return result;
   }
 
   /**
