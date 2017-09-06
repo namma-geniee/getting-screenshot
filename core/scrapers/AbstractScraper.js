@@ -1,5 +1,6 @@
 'use strict';
 
+const path          = require('path');
 const puppeteer     = require('puppeteer');
 const fs            = require('fs.extra');
 const storageHelper = require('../helper/storageHelper');
@@ -22,8 +23,16 @@ class AbstractScraper {
   /**
    * @returns {string}
    */
-  get taskStoragePath () {
-    return storageHelper.getTaskStoragePath(this.scrapingTask)
+  get logFilePath () {
+    return storageHelper.getTaskLogPath(this.scrapingTask);
+  }
+
+  /**
+   * @returns {string}
+   */
+  get screenshotPath () {
+    const { adnetworkId, accountId } = this.scrapingTask;
+    return `/tmp/getting-screenshot-${adnetworkId}-${accountId}.png`
   }
 
   /**
@@ -48,7 +57,7 @@ class AbstractScraper {
 
     await this.page.setViewport(this.viewport);
 
-    await fs.mkdirRecursiveSync(this.taskStoragePath)
+    await fs.mkdirRecursiveSync(path.dirname(this.logFilePath));
   }
 
   /**
@@ -59,7 +68,9 @@ class AbstractScraper {
   async run () {
     await this.init();
 
-    const screenshotPath = `${this.taskStoragePath}/screenshot.png`;
+    let revenue              = null;
+    const { screenshotPath } = this;
+    const startTime          = new Date();
 
     try {
       const authenticated = await this.login();
@@ -67,8 +78,7 @@ class AbstractScraper {
         throw new Error(MESSAGE_AUTH_FAILED)
       }
 
-      const revenue = await this.getRevenue();
-      console.info(`> Revenue = ${revenue}`)
+      revenue = await this.getRevenue();
     }
     catch (err) {
       console.error('> Got error:', err)
@@ -81,7 +91,20 @@ class AbstractScraper {
     });
 
     // Close the browser after the task is done
-    await this.browser.close()
+    await this.browser.close();
+
+    const endTime    = new Date();
+    const elapsedMs  = endTime - startTime;
+    const elapsedSec = (elapsedMs / 1000).toFixed(3);
+
+    return {
+      revenue,
+      screenshotPath,
+      startTime,
+      endTime,
+      elapsedMs,
+      elapsedSec
+    };
   }
 
   /**

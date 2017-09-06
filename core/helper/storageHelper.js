@@ -11,14 +11,22 @@ const STORAGE_DATA_PATH = path.join(STORAGE_ROOT_PATH, 'data');
  * @returns {string}
  */
 exports.getStoragePath = function (storageRelativePath ) {
-  return path.join(STORAGE_ROOT_PATH, storageRelativePath)
+  return path.join(STORAGE_ROOT_PATH, storageRelativePath);
+};
+
+/**
+ * @param {string} relativePath
+ * @returns {string}
+ */
+exports.getDataPath = function (relativePath) {
+  return path.join(STORAGE_DATA_PATH, relativePath);
 };
 
 /**
  * @param {ScrapingTask} task
  * @returns {string}
  */
-exports.getTaskStoragePath = function (task) {
+exports.getTaskLogPath = function (task) {
   const yearAndMonth = moment(task.scheduleTime).format('YYYY-MM');
-  return path.join(STORAGE_DATA_PATH, `${yearAndMonth}/${task.adnetworkName}/${task.accountName}`);
+  return this.getDataPath(`${yearAndMonth}/${task.adnetworkName}.log`);
 };
