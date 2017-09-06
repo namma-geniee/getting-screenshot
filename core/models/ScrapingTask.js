@@ -7,19 +7,27 @@ class ScrapingTask {
    */
   constructor (scheduleTime, adnetworkAccount) {
     this.scheduleTime     = scheduleTime;
-    this.adnetworkAccount = adnetworkAccount
+    this.adnetworkAccount = adnetworkAccount;
+  }
+
+  get adnetworkId () {
+    return this.adnetworkAccount.adnetworkId;
   }
 
   get adnetworkName () {
-    return this.adnetworkAccount.adnetworkName
+    return this.adnetworkAccount.adnetworkName;
+  }
+
+  get accountId () {
+    return this.adnetworkAccount.accountId;
   }
 
   get accountName () {
-    return this.adnetworkAccount.accountName
+    return this.adnetworkAccount.accountName;
   }
 
   get credentials () {
-    return this.adnetworkAccount.credentials
+    return this.adnetworkAccount.credentials;
   }
 }
 
