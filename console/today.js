@@ -10,6 +10,16 @@ const SHIFTED_TASKS_COUNT = 16;
 
 process.setMaxListeners(0);
 
+winston.configure({
+  transports: [
+    new winston.transports.Console({
+      level: 'debug',
+      prettyPrint: true
+    })
+  ]
+});
+winston.cli();
+
 (async function () {
   const tasks = await aladdinFrontApi.getTodayTasks();
 
@@ -30,7 +40,9 @@ process.setMaxListeners(0);
  * @returns {Promise}
  */
 function executeScraper (scraper) {
-  const taskName = `$\{task.accountName} of $\{task.adnetworkName}`;
+  const task     = scraper.scrapingTask;
+  const taskName = `${task.accountName} of ${task.adnetworkName}`;
+
   return scraper
     .run()
     .then(function (summary) {
