@@ -3,6 +3,7 @@
 const path          = require('path');
 const puppeteer     = require('puppeteer');
 const fs            = require('fs.extra');
+const winston       = require('winston');
 const storageHelper = require('../helper/storageHelper');
 const slackNotifier = require('../slack/notifier');
 const config        = require('../../config');
@@ -15,34 +16,27 @@ class AbstractScraper {
    * @param {ScrapingTask} scrapingTask
    */
   constructor (scrapingTask) {
-    this.scrapingTask = scrapingTask;
-    this.browser      = undefined;
-    this.page         = undefined
-  }
+    const { adnetworkId, accountId } = scrapingTask;
+    const logFile  = storageHelper.getTaskLogPath(scrapingTask);
+    const logLabel = `#${accountId}`;
 
-  /**
-   * @returns {string}
-   */
-  get logFilePath () {
-    return storageHelper.getTaskLogPath(this.scrapingTask);
-  }
-
-  /**
-   * @returns {string}
-   */
-  get screenshotPath () {
-    const { adnetworkId, accountId } = this.scrapingTask;
-    return `/tmp/getting-screenshot-${adnetworkId}-${accountId}.png`
-  }
-
-  /**
-   * Viewport configuration for the page.
-   * Developer may OVERRIDE THIS.
-   *
-   * @returns {{width: {number}, height: {number}}}
-   */
-  get viewport () {
-    return config.page.defaultViewport
+    this.scrapingTask   = scrapingTask;
+    this.browser        = undefined;
+    this.page           = undefined;
+    this.viewport       = config.page.defaultViewport;
+    this.screenshotPath = `/tmp/getting-screenshot-${adnetworkId}-${accountId}.png`;
+    this.logFile        = logFile;
+    this.logger         = new winston.Logger({
+      transports: [
+        new winston.transports.File({
+          level:       'debug',
+          label:       logLabel,
+          filename:    logFile,
+          json:        false,
+          prettyPrint: true
+        })
+      ]
+    });
   }
 
   /**
@@ -57,19 +51,18 @@ class AbstractScraper {
 
     await this.page.setViewport(this.viewport);
 
-    await fs.mkdirRecursiveSync(path.dirname(this.logFilePath));
+    fs.mkdirRecursiveSync(path.dirname(this.logFile));
   }
 
   /**
    * Main execution script
    *
-   * @returns {Promise.<{revenue: undefined, screenshotPath: string, startTime: Date, endTime: undefined, elapsedMs: undefined, elapsedSec: undefined}>}
+   * @returns {Promise.<{Object}>}
    */
   async run () {
-    await this.init();
-
-    // Some of result's properties will be defined later in & after scraping process
-    const result = {
+    const { logger } = this;
+    // Some of summary data will be defined later in & after scraping process
+    const summary = {
       revenue:        undefined,
       screenshotPath: this.screenshotPath,
       startTime:      new Date(),
@@ -78,33 +71,42 @@ class AbstractScraper {
       elapsedSec:     undefined
     };
 
-    // TODO: Remove try-catch
     try {
+      await this.init();
+
+      logger.info('Start authentication');
       const authenticated = await this.login();
       if (!authenticated) {
         throw new Error(MESSAGE_AUTH_FAILED)
       }
+      logger.info('Authenticated');
 
-      result.revenue = await this.getRevenue();
+      logger.info('Start collecting revenue');
+      summary.revenue = await this.getRevenue();
+      logger.info('Revenue collected:', summary.revenue);
+
+      // Save screenshot for the last screen whether succeeded or failed
+      logger.info('Start taking screenshot for the last screen');
+      await this.page.screenshot({
+        path:     summary.screenshotPath,
+        fullPage: true
+      });
+      logger.info('Screenshot saved:', summary.screenshotPath);
+
+      // Close the browser after the task is done
+      await this.browser.close();
+
+      summary.endTime    = new Date();
+      summary.elapsedMs  = summary.endTime - summary.startTime;
+      summary.elapsedSec = (summary.elapsedMs / 1000).toFixed(3);
+      logger.info('SUMMARY', summary);
+
+      return summary;
+    } catch (err) {
+      logger.error(err);
+      await this.browser.close();
+      throw err;
     }
-    catch (err) {
-      console.error('> Got error:', err)
-    }
-
-    // Save screenshot for the last screen whether succeeded or failed
-    await this.page.screenshot({
-      path:     result.screenshotPath,
-      fullPage: true
-    });
-
-    // Close the browser after the task is done
-    await this.browser.close();
-
-    result.endTime    = new Date();
-    result.elapsedMs  = result.endTime - result.startTime;
-    result.elapsedSec = (result.elapsedMs / 1000).toFixed(3);
-
-    return result;
   }
 
   /**
